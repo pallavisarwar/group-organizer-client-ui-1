@@ -1,12 +1,12 @@
-import { useParams } from "react-router"
-import "./memberDetailsPage.css"
+import { useParams } from "react-router";
+import "./memberDetailsPage.css";
 
 export const MemberDetailsPage = () => {
-    const params = useParams();
+  const params = useParams();
 
-    return (
+  return (
     <div className="member-details-page">
-        <h3>details for member {params.id}</h3>
+      <h3>details for member {params.id}</h3>
     </div>
-    );
+  );
 };

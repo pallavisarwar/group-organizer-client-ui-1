@@ -1,98 +1,90 @@
-import { useEffect, useState } from "react";
 import "./membersPage.css";
-import { create, getHealth } from "../../services/healthServices";
+
+import { useEffect, useRef, useState } from "react";
+
+import { create, getHealth, update } from "../../services/healthServices";
+
+import { Button } from "../../components/button/Button";
+import { Plus } from "../../assets/icons/plus/Plus";
+import { Edit } from "../../assets/icons/edit/Edit";
+import { Modal } from "../../components/modal/Modal";
+import { MODAL_TYPES } from "../../common/constants/modalTypes";
 
 export const MembersPage = () => {
   const [items, setItems] = useState([]);
-  const [request, setRequest] = useState({
-    nickName: "",
-    bio: "",
-    avatarUrl: "",
-    age: 0,
-    groupId: 0,
-  });
 
-  const [isChange, setIsChange] = useState(false);
+  const [isModal, setIsModal] = useState(false);
+
+  const modalType = useRef(MODAL_TYPES.Create);
+  const modalItem = useRef({});
 
   useEffect(() => {
     getItems();
-  }, [isChange]);
+  }, [isModal]);
 
   const getItems = async () => {
     const result = await getHealth();
     setItems(result.data);
   };
 
-  const handleInput = (event) => {
-    const { name, value } = event.target;
-    setRequest((previous) => ({ ...previous, [name]: value }));
-  };
-
-  const handleSubmit = async () => {
+  const handleCreate = async (request = {}) => {
     const result = await create(request);
     console.log("member created:", result.data);
-    setIsChange(!isChange);
+    toggleModal();
+  };
+
+  const handleEdit = async (id = 0, request = {}) => {
+    const result = await update(id, request);
+    console.log("member edited:", result.data);
+    toggleModal();
+  };
+
+  const toggleModal = () => {
+    setIsModal(!isModal);
   };
 
   return (
     <div className="home-page">
-      {/*<pre>{JSON.stringify(items, null, 2)}</pre>*/}
-      {/* <pre>{JSON.stringify(request, null, 2)}</pre> */}
-      <form>
-        <label htmlFor="nickName">
-          new member NickName
-          <input
-            type="text"
-            name="nickName"
-            value={request.nickname}
-            onChange={handleInput}
-          />
-        </label>
-        <label htmlFor="bio">
-          new member Bio
-          <input
-            type="text"
-            name="bio"
-            value={request.bio}
-            onChange={handleInput}
-          />
-        </label>
-        <label htmlFor="avatarUrl">
-          new member AvatarURL
-          <input
-            type="text"
-            name="avatarUrl"
-            value={request.avatarUrl}
-            onChange={handleInput}
-          />
-        </label>
-        <label htmlFor="age">
-          new member Age
-          <input
-            type="text"
-            name="age"
-            value={request.age}
-            onChange={handleInput}
-          />
-        </label>
-        <label htmlFor="groupId">
-          new member GroupId
-          <input
-            type="text"
-            name="groupId"
-            value={request.groupId}
-            onChange={handleInput}
-          />
-        </label>
-        <button type="button" onClick={handleSubmit}>
-          Create new member
-        </button>
-      </form>
+      {/* <pre>{JSON.stringify(items, null, 2)}</pre> */}
+
+      <Button
+        style="icon"
+        text={<Plus />}
+        action={() => {
+          modalType.current = MODAL_TYPES.Create;
+          modalItem.current = {};
+          toggleModal();
+        }}
+      />
+
+      {isModal && (
+        <Modal
+          type={modalType.current}
+          item={modalItem.current}
+          handleCreate={handleCreate}
+          handleEdit={handleEdit}
+          onClose={toggleModal}
+        />
+      )}
+
       {items.length > 0 ? (
         <ul>
           {items.map((item, i) => (
-            <li key={i}>
-              <h4>{item.NickName}</h4>
+            <li className="list-item" key={i}>
+              <div>
+                <h4>{item.NickName}</h4>
+                <p>{item.Bio}</p>
+                <p>{item.AvatarURL}</p>
+              </div>
+              <Button
+                action={() => {
+                  modalType.current = MODAL_TYPES.Edit;
+                  modalItem.current = item;
+                  toggleModal();
+                }}
+                style="icon"
+                text={<Edit />}
+              />
             </li>
           ))}
         </ul>

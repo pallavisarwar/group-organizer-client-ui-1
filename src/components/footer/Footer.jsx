@@ -1,16 +1,14 @@
-
 import { useGroupOrganizer } from "../../contexts/GroupOrganizerContext";
-import "./footer.css"
+import { Button } from "../button/Button";
+import "./footer.css";
 
- export const Footer  = () => {
-   const { isFontSizeLarge, setFontSize} = useGroupOrganizer();
+export const Footer = () => {
+  const { isFontSizeLarge, setFontSize } = useGroupOrganizer();
 
-    return (
-    <div className={isFontSizeLarge? "footer large" : "footer small"}>
-      <p>footer footer</p>
-         <button type="button" onClick={setFontSize}>
-           set font size
-         </button>
-          </div>
-    );
- };
+  return (
+    <div className={isFontSizeLarge ? "footer large" : "footer small"}>
+      <p>footer footer footer</p>
+      <Button action={setFontSize} text="set font size" />
+    </div>
+  );
+};
